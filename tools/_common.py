@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -11,11 +10,19 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(REPO_ROOT / ".env")
 
 
+class MissingEnv(RuntimeError):
+    """Raised when a required env var is unset.
+
+    A regular exception (not SystemExit) so callers like the web UI can catch
+    it and surface a useful message in the page. CLI tools handle it in main()
+    by printing a hint and exiting non-zero.
+    """
+
+
 def env(name: str, default: str | None = None, *, required: bool = False) -> str:
     val = os.environ.get(name, default)
     if required and not val:
-        sys.stderr.write(f"ERROR: required env var {name} is not set (see .env.example)\n")
-        sys.exit(2)
+        raise MissingEnv(f"required env var {name} is not set (see .env.example)")
     return val or ""
 
 

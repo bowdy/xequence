@@ -51,6 +51,13 @@ app = FastAPI(title="Xequence")
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 
+def view(request: Request, name: str, **context) -> HTMLResponse:
+    """Thin wrapper around TemplateResponse using the starlette 1.0+ signature
+    (request first, then template name, then context dict). Named `view` to
+    avoid shadowing `tools.sequences.render`."""
+    return templates.TemplateResponse(request, name, context)
+
+
 # ---------- helpers --------------------------------------------------------
 
 
@@ -96,15 +103,13 @@ def read_mutuals_file() -> list[str]:
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     ok, msg = session_ok()
-    return templates.TemplateResponse(
+    return view(
+        request,
         "index.html",
-        {
-            "request": request,
-            "session_ok": ok,
-            "session_msg": msg,
-            "sequences": list_sequences(),
-            "mutuals_count": len(read_mutuals_file()),
-        },
+        session_ok=ok,
+        session_msg=msg,
+        sequences=list_sequences(),
+        mutuals_count=len(read_mutuals_file()),
     )
 
 
@@ -114,10 +119,7 @@ def index(request: Request):
 @app.get("/partials/session", response_class=HTMLResponse)
 def partial_session(request: Request):
     ok, msg = session_ok()
-    return templates.TemplateResponse(
-        "_session.html",
-        {"request": request, "session_ok": ok, "session_msg": msg},
-    )
+    return view(request, "_session.html", session_ok=ok, session_msg=msg)
 
 
 @app.get("/partials/contacts", response_class=HTMLResponse)
@@ -140,35 +142,23 @@ def partial_contacts(request: Request):
                 pass
         rows.append({"c": c, "due": due})
 
-    return templates.TemplateResponse(
-        "_contacts.html",
-        {"request": request, "rows": rows, "error": error, "total": len(rows)},
-    )
+    return view(request, "_contacts.html", rows=rows, error=error, total=len(rows))
 
 
 @app.get("/partials/jobs", response_class=HTMLResponse)
 def partial_jobs(request: Request):
-    return templates.TemplateResponse(
-        "_jobs.html",
-        {"request": request, "jobs": [j.to_dict() for j in jobs.recent()]},
-    )
+    return view(request, "_jobs.html", jobs=[j.to_dict() for j in jobs.recent()])
 
 
 @app.get("/partials/mutuals", response_class=HTMLResponse)
 def partial_mutuals(request: Request):
     handles = read_mutuals_file()
-    return templates.TemplateResponse(
-        "_mutuals.html",
-        {"request": request, "handles": handles, "count": len(handles)},
-    )
+    return view(request, "_mutuals.html", handles=handles, count=len(handles))
 
 
 @app.get("/partials/sequences", response_class=HTMLResponse)
 def partial_sequences(request: Request):
-    return templates.TemplateResponse(
-        "_sequences.html",
-        {"request": request, "sequences": list_sequences()},
-    )
+    return view(request, "_sequences.html", sequences=list_sequences())
 
 
 @app.get("/sequences/{name}/raw", response_class=HTMLResponse)
@@ -203,9 +193,7 @@ def action_pull_mutuals(request: Request):
         return {"count": len(mutuals), "file": str(out)}
 
     job = jobs.start_job("pull_mutuals", work)
-    return templates.TemplateResponse(
-        "_job_row.html", {"request": request, "job": job.to_dict()}
-    )
+    return view(request, "_job_row.html", job=job.to_dict())
 
 
 @app.post("/actions/enroll", response_class=HTMLResponse)
@@ -246,10 +234,7 @@ def action_enroll(
         )
         added += 1
 
-    return templates.TemplateResponse(
-        "_enroll_result.html",
-        {"request": request, "added": added, "skipped": skipped, "sequence": sequence},
-    )
+    return view(request, "_enroll_result.html", added=added, skipped=skipped, sequence=sequence)
 
 
 @app.post("/actions/tick", response_class=HTMLResponse)
@@ -288,9 +273,7 @@ def action_tick(request: Request, dry_run: str = Form("")):
             })
             if len(previews) >= max_per_run:
                 break
-        return templates.TemplateResponse(
-            "_tick_preview.html", {"request": request, "previews": previews, "cap": max_per_run}
-        )
+        return view(request, "_tick_preview.html", previews=previews, cap=max_per_run)
 
     # Real send — spawn a job. The job mirrors send_due_messages.py.
     def work(job: jobs.Job):
@@ -375,9 +358,7 @@ def action_tick(request: Request, dry_run: str = Form("")):
         return {"sent": sent}
 
     job = jobs.start_job("tick", work)
-    return templates.TemplateResponse(
-        "_job_row.html", {"request": request, "job": job.to_dict()}
-    )
+    return view(request, "_job_row.html", job=job.to_dict())
 
 
 @app.post("/actions/save-sequence", response_class=HTMLResponse)
@@ -404,10 +385,7 @@ def action_save_sequence(
         path.unlink(missing_ok=True)
         raise HTTPException(400, f"Sequence failed validation: {e}")
 
-    return templates.TemplateResponse(
-        "_sequences.html",
-        {"request": request, "sequences": list_sequences(), "saved": name},
-    )
+    return view(request, "_sequences.html", sequences=list_sequences(), saved=name)
 
 
 @app.post("/jobs/{job_id}/cancel", response_class=HTMLResponse)
@@ -416,9 +394,7 @@ def cancel_job(job_id: str, request: Request):
     if not job:
         raise HTTPException(404)
     job.cancel()
-    return templates.TemplateResponse(
-        "_job_row.html", {"request": request, "job": job.to_dict()}
-    )
+    return view(request, "_job_row.html", job=job.to_dict())
 
 
 @app.get("/jobs/{job_id}", response_class=HTMLResponse)
@@ -426,6 +402,4 @@ def get_job(job_id: str, request: Request):
     job = jobs.get(job_id)
     if not job:
         raise HTTPException(404)
-    return templates.TemplateResponse(
-        "_job_row.html", {"request": request, "job": job.to_dict()}
-    )
+    return view(request, "_job_row.html", job=job.to_dict())
