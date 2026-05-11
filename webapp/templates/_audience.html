@@ -1,0 +1,85 @@
+<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+    <h2 class="text-base font-semibold">2. Audience</h2>
+    <div class="flex gap-2">
+      <button type="button"
+              hx-post="/actions/pull-mutuals" hx-target="#jobs-area" hx-swap="afterbegin"
+              class="bg-zinc-800 hover:bg-zinc-700 text-xs px-3 py-1.5 rounded-lg">
+        Pull mutuals
+      </button>
+      <button type="button"
+              hx-post="/actions/pull-followers" hx-target="#jobs-area" hx-swap="afterbegin"
+              class="bg-zinc-800 hover:bg-zinc-700 text-xs px-3 py-1.5 rounded-lg">
+        Pull followers
+      </button>
+    </div>
+  </div>
+
+  <p class="text-sm text-zinc-400 mb-3">
+    Pulls write to disk and surface as live jobs below. Click a source button to switch what's shown
+    — your selections aren't preserved across switches, so finish one list before moving to the other.
+  </p>
+
+  <div class="flex items-center gap-2 mb-3 text-xs">
+    <span class="text-zinc-500">Showing:</span>
+    {% for src, cnt in counts.items() %}
+      <button type="button"
+              hx-get="/partials/audience?source={{ src }}"
+              hx-target="#audience-area" hx-swap="innerHTML"
+              class="px-3 py-1 rounded transition-colors
+                {% if src == source %}bg-emerald-700 text-white{% else %}bg-zinc-800 text-zinc-300 hover:bg-zinc-700{% endif %}">
+        {{ src }} ({{ cnt }})
+      </button>
+    {% endfor %}
+    <button type="button"
+            title="Refresh list"
+            hx-get="/partials/audience?source={{ source }}"
+            hx-target="#audience-area" hx-swap="innerHTML"
+            class="ml-auto text-zinc-500 hover:text-zinc-300">↻ refresh</button>
+  </div>
+
+  {% if not handles %}
+    <div class="text-sm text-zinc-500 p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
+      No <span class="mono">{{ source }}</span> list yet. Click <span class="mono">Pull {{ source }}</span> above.
+      The pull runs in the background — watch the jobs panel below for progress, then click <span class="mono">{{ source }}</span> again to load the list.
+    </div>
+  {% else %}
+    <form hx-post="/actions/enroll-selected" hx-target="#enroll-result" hx-swap="innerHTML">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-lg">
+        <div class="sticky top-0 bg-zinc-950 px-3 py-2 border-b border-zinc-800 flex items-center gap-3 text-xs">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" checked
+                   onclick="this.closest('form').querySelectorAll('input[name=handles]').forEach(cb => cb.checked = this.checked)">
+            <span class="text-zinc-300">all</span>
+          </label>
+          <span class="text-zinc-500 ml-auto">{{ count }} handles · {{ source }} · pulled {{ pulled_at[:16] if pulled_at else 'unknown' }}</span>
+        </div>
+        <div class="max-h-96 overflow-y-auto divide-y divide-zinc-800">
+          {% for h in handles %}
+            <label class="flex items-center gap-2 px-3 py-1.5 hover:bg-zinc-900 cursor-pointer">
+              <input type="checkbox" name="handles" value="{{ h }}" checked>
+              <a href="https://x.com/{{ h }}" target="_blank"
+                 class="mono text-sm text-zinc-200 hover:text-emerald-400"
+                 onclick="event.stopPropagation()">@{{ h }}</a>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mt-4 flex-wrap">
+        <label class="text-xs text-zinc-500">Enroll into</label>
+        <select name="sequence"
+                class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm">
+          {% for s in sequences %}
+            <option value="{{ s.name }}">{{ s.name }} ({{ s.step_count }} steps)</option>
+          {% endfor %}
+        </select>
+        <button type="submit"
+                class="ml-auto bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-lg">
+          Enroll selected
+        </button>
+      </div>
+    </form>
+    <div id="enroll-result" class="mt-3"></div>
+  {% endif %}
+</div>

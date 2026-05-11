@@ -15,53 +15,17 @@
   </div>
 </section>
 
-<!-- ROW 2: pull mutuals + enroll -->
-<section class="grid md:grid-cols-2 gap-6">
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-    <h2 class="text-base font-semibold mb-1">2. Pull mutual follows</h2>
-    <p class="text-sm text-zinc-400 mb-4">
-      Scrolls /following and /followers and intersects them. Slow — usually 2–10 minutes depending on follower count.
-    </p>
-    <form hx-post="/actions/pull-mutuals" hx-target="#jobs-area" hx-swap="afterbegin">
-      <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-lg" type="submit">
-        Pull mutuals
-      </button>
-    </form>
-    <div class="mt-4 text-xs text-zinc-500" id="mutuals-summary"
-         hx-get="/partials/mutuals" hx-trigger="load, every 10s" hx-swap="innerHTML">loading…</div>
-  </div>
-
-  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-    <h2 class="text-base font-semibold mb-1">3. Enroll handles</h2>
-    <p class="text-sm text-zinc-400 mb-4">
-      Paste handles (newline or comma separated, with or without @). Already-enrolled handles are skipped.
-    </p>
-    <form hx-post="/actions/enroll" hx-target="#enroll-result" hx-swap="innerHTML" class="space-y-3">
-      <textarea name="handles" rows="5" placeholder="alice
-bob
-@carol"
-        class="mono w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm focus:border-emerald-600 focus:outline-none"></textarea>
-      <div class="flex items-center gap-3">
-        <label class="text-xs text-zinc-500">Sequence</label>
-        <select name="sequence" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm">
-          {% for s in sequences %}
-            <option value="{{ s.name }}">{{ s.name }} ({{ s.step_count }} steps)</option>
-          {% endfor %}
-        </select>
-        <button class="ml-auto bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-lg" type="submit">
-          Enroll
-        </button>
-      </div>
-    </form>
-    <div id="enroll-result" class="mt-4 text-sm"></div>
-  </div>
+<!-- ROW 2: audience (pull + checkbox list + enroll-selected, all in one) -->
+<section id="audience-area"
+         hx-get="/partials/audience?source=mutuals" hx-trigger="load" hx-swap="innerHTML">
+  <div class="p-6 text-sm text-zinc-500 bg-zinc-900 border border-zinc-800 rounded-2xl">loading audience…</div>
 </section>
 
 <!-- ROW 3: tick -->
 <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
   <div class="flex items-start justify-between gap-6 flex-wrap">
     <div>
-      <h2 class="text-base font-semibold mb-1">4. Run a tick</h2>
+      <h2 class="text-base font-semibold mb-1">3. Run a tick</h2>
       <p class="text-sm text-zinc-400">
         Sends every DM that's come due, paced by your <span class="mono text-zinc-300">.env</span> jitter settings.
         Dry-run shows what would be sent without touching X.

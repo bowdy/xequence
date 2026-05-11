@@ -44,7 +44,7 @@ from tools.sequences import (  # noqa: E402
     schedule_for_step,
 )
 from tools.sheets_client import Contact, now_iso, read_all, update_contact, upsert_contact  # noqa: E402
-from tools.twitter_client import fetch_display_name, fetch_mutuals, send_dm  # noqa: E402
+from tools.twitter_client import fetch_display_name, fetch_followers, fetch_mutuals, send_dm  # noqa: E402
 from webapp import jobs  # noqa: E402
 
 app = FastAPI(title="Xequence")
@@ -100,11 +100,30 @@ def list_sequences() -> list[dict]:
     return out
 
 
-def read_mutuals_file() -> list[str]:
-    p = REPO_ROOT / ".tmp" / "mutuals.txt"
-    if not p.exists():
-        return []
-    return [line.strip() for line in p.read_text().splitlines() if line.strip()]
+AUDIENCE_SOURCES = {
+    "mutuals": REPO_ROOT / ".tmp" / "mutuals.txt",
+    "followers": REPO_ROOT / ".tmp" / "followers.txt",
+}
+
+
+def read_audience(source: str) -> dict:
+    """Return the audience for `source` plus its file metadata.
+
+    Each source maps to one .tmp file. Files are plain text, one handle per
+    line. Missing files are treated as empty, not an error — the UI should
+    surface "no list yet, click pull".
+    """
+    p = AUDIENCE_SOURCES.get(source)
+    if p is None or not p.exists():
+        return {"source": source, "handles": [], "pulled_at": None}
+    handles = [line.strip() for line in p.read_text().splitlines() if line.strip()]
+    pulled_at = datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc)
+    return {"source": source, "handles": handles, "pulled_at": pulled_at.isoformat()}
+
+
+def audience_summary() -> dict[str, int]:
+    """Count of handles in each known source file (for the source switcher)."""
+    return {src: len(read_audience(src)["handles"]) for src in AUDIENCE_SOURCES}
 
 
 # ---------- pages ----------------------------------------------------------
@@ -119,7 +138,7 @@ def index(request: Request):
         session_ok=ok,
         session_msg=msg,
         sequences=list_sequences(),
-        mutuals_count=len(read_mutuals_file()),
+        audience_counts=audience_summary(),
     )
 
 
@@ -160,10 +179,21 @@ def partial_jobs(request: Request):
     return view(request, "_jobs.html", jobs=[j.to_dict() for j in jobs.recent()])
 
 
-@app.get("/partials/mutuals", response_class=HTMLResponse)
-def partial_mutuals(request: Request):
-    handles = read_mutuals_file()
-    return view(request, "_mutuals.html", handles=handles, count=len(handles))
+@app.get("/partials/audience", response_class=HTMLResponse)
+def partial_audience(request: Request, source: str = "mutuals"):
+    if source not in AUDIENCE_SOURCES:
+        raise HTTPException(400, f"unknown source: {source}")
+    data = read_audience(source)
+    return view(
+        request,
+        "_audience.html",
+        source=source,
+        handles=data["handles"],
+        count=len(data["handles"]),
+        pulled_at=data["pulled_at"],
+        counts=audience_summary(),
+        sequences=list_sequences(),
+    )
 
 
 @app.get("/partials/sequences", response_class=HTMLResponse)
@@ -204,6 +234,68 @@ def action_pull_mutuals(request: Request):
 
     job = jobs.start_job("pull_mutuals", work)
     return view(request, "_job_row.html", job=job.to_dict())
+
+
+@app.post("/actions/pull-followers", response_class=HTMLResponse)
+def action_pull_followers(request: Request):
+    if jobs.is_running("pull_followers"):
+        raise HTTPException(409, "A pull_followers job is already running.")
+
+    handle = env("X_HANDLE", required=True).lstrip("@")
+
+    def work(job: jobs.Job):
+        job.append(f"Opening X session for @{handle}…")
+        with x_session(headless=True) as (_ctx, page):
+            job.append("Scrolling /followers (this can take several minutes for large accounts)…")
+            followers = sorted(fetch_followers(page, handle))
+        out = AUDIENCE_SOURCES["followers"]
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text("\n".join(followers) + "\n")
+        job.append(f"Wrote {len(followers)} followers to {out}")
+        return {"count": len(followers), "file": str(out)}
+
+    job = jobs.start_job("pull_followers", work)
+    return view(request, "_job_row.html", job=job.to_dict())
+
+
+@app.post("/actions/enroll-selected", response_class=HTMLResponse)
+def action_enroll_selected(
+    request: Request,
+    handles: list[str] = Form(default_factory=list),
+    sequence: str = Form("default"),
+):
+    """Enroll handles selected via checkboxes in the audience list.
+
+    Each checked checkbox in `_audience.html` carries name="handles" and the
+    handle as its value. FastAPI collects them as a list automatically.
+    """
+    parsed = [h.strip().lstrip("@").lower() for h in handles if h.strip()]
+    if not parsed:
+        raise HTTPException(400, "No handles selected.")
+
+    seq = load_sequence(sequence)
+    enrolled_at = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    first_send = schedule_for_step(enrolled_at, seq.steps[0])
+
+    existing = {(c.handle, c.sequence) for c in read_all()}
+    added, skipped = 0, 0
+    for handle in parsed:
+        if (handle, sequence) in existing:
+            skipped += 1
+            continue
+        upsert_contact(
+            Contact(
+                handle=handle,
+                sequence=sequence,
+                enrolled_at=enrolled_at.isoformat(),
+                current_step=0,
+                next_send_at=first_send.isoformat(),
+                status="pending",
+            )
+        )
+        added += 1
+
+    return view(request, "_enroll_result.html", added=added, skipped=skipped, sequence=sequence)
 
 
 @app.post("/actions/enroll", response_class=HTMLResponse)
