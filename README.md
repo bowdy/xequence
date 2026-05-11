@@ -63,7 +63,30 @@ python tools/browser_session.py check
 
 ## Usage
 
-### Pull your mutuals
+You can drive Xequence two ways. They share the same state (the Sheet), so mixing is fine.
+
+### Option A: Web UI (recommended)
+
+```bash
+python -m webapp
+```
+
+Open http://127.0.0.1:8000. You get:
+
+- A session-status badge in the header (refreshes every 30s).
+- A **Pull mutuals** button — scrolls /following + /followers in the background and shows a live log.
+- An **Enroll** form — paste handles, pick a sequence, click Enroll.
+- A **Tick** panel with a dry-run preview and a "Send now" confirm.
+- A contacts table that auto-refreshes from the Sheet every 15s.
+- A sequences editor — edit YAML in the browser, saves are validated before disk.
+
+The UI is HTMX + Jinja2 server-rendered. No build step. Everything runs in one Python process on localhost.
+
+### Option B: CLI
+
+Same operations, scriptable. Useful for `cron` / `launchd`.
+
+#### Pull your mutuals
 
 ```bash
 python tools/pull_mutuals.py
@@ -72,7 +95,7 @@ python tools/pull_mutuals.py
 
 This scrolls /following and /followers to completion and intersects them. Slow but reliable. Use `--headed` to watch.
 
-### Enroll handles into a sequence
+#### Enroll handles into a sequence
 
 Curate `.tmp/mutuals.txt` down to the people you actually want to reach (save as `.tmp/shortlist.txt`), then:
 
@@ -82,7 +105,7 @@ python tools/enroll_contacts.py --file .tmp/shortlist.txt --sequence default
 
 Already-enrolled handles are skipped, so re-running is safe.
 
-### Run the tick (sends due messages)
+#### Run the tick (sends due messages)
 
 Dry run to see what's queued:
 ```bash
@@ -132,6 +155,7 @@ Status values: `pending`, `in_progress`, `completed`, `error`, `stopped`. You ca
 sequences/         YAML sequence definitions you author
 tools/             deterministic Python scripts (the W in WAT)
 workflows/         markdown SOPs Claude follows (the W in WAT)
+webapp/            local FastAPI + HTMX UI (run with `python -m webapp`)
 .tmp/              scratch space (mutuals dumps, tick logs)
 .env               your secrets — never commit
 ```

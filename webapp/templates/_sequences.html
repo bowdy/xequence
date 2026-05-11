@@ -1,0 +1,59 @@
+<div class="p-4 space-y-3">
+  {% for s in sequences %}
+    <details class="bg-zinc-950 border border-zinc-800 rounded-lg">
+      <summary class="cursor-pointer px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="mono text-zinc-200">{{ s.name }}</span>
+          {% if s.error %}
+            <span class="badge bg-red-950 text-red-300 border border-red-900">error</span>
+          {% else %}
+            <span class="text-xs text-zinc-500">{{ s.step_count }} steps · day_offsets {{ s.day_offsets }}</span>
+          {% endif %}
+        </div>
+        <span class="text-xs text-zinc-500">{{ s.file }}</span>
+      </summary>
+      <div class="px-4 pb-4">
+        <form hx-post="/actions/save-sequence" hx-target="#sequences-area" hx-swap="innerHTML" class="space-y-2">
+          <input type="hidden" name="name" value="{{ s.name }}">
+          <textarea name="body" rows="12"
+            class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-xs focus:border-emerald-600 focus:outline-none"
+            hx-get="/sequences/{{ s.name }}/raw"
+            hx-trigger="load once"
+            hx-swap="innerHTML"></textarea>
+          <div class="flex justify-end">
+            <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg" type="submit">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </details>
+  {% endfor %}
+  {% if saved %}
+    <div class="text-xs text-emerald-400">Saved <span class="mono">{{ saved }}</span>.</div>
+  {% endif %}
+
+  <details class="bg-zinc-950 border border-zinc-800 rounded-lg">
+    <summary class="cursor-pointer px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-zinc-300">+ new sequence</span>
+    </summary>
+    <div class="px-4 pb-4">
+      <form hx-post="/actions/save-sequence" hx-target="#sequences-area" hx-swap="innerHTML" class="space-y-2">
+        <input type="text" name="name" placeholder="my-sequence"
+               class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-sm focus:border-emerald-600 focus:outline-none">
+        <textarea name="body" rows="10" placeholder="name: my-sequence
+steps:
+  - day_offset: 0
+    message: 'hey {first_name}…'
+  - day_offset: 3
+    message: 'ping…'"
+          class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-xs focus:border-emerald-600 focus:outline-none"></textarea>
+        <div class="flex justify-end">
+          <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg" type="submit">
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
+  </details>
+</div>

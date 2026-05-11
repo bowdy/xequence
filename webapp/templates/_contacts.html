@@ -1,0 +1,52 @@
+{% if error %}
+  <div class="p-6 text-sm text-amber-300">
+    Couldn’t load sheet: <span class="mono">{{ error }}</span>
+  </div>
+{% elif not rows %}
+  <div class="p-6 text-sm text-zinc-500">No contacts enrolled yet.</div>
+{% else %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-zinc-950 text-xs uppercase text-zinc-500">
+        <tr>
+          <th class="text-left px-4 py-2">handle</th>
+          <th class="text-left px-4 py-2">sequence</th>
+          <th class="text-left px-4 py-2">step</th>
+          <th class="text-left px-4 py-2">next send</th>
+          <th class="text-left px-4 py-2">status</th>
+          <th class="text-left px-4 py-2">notes</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800">
+        {% for r in rows %}
+        {% set c = r.c %}
+        <tr class="{% if r.due %}bg-emerald-950/30{% endif %}">
+          <td class="px-4 py-2 mono">
+            <a class="hover:text-emerald-400" href="https://x.com/{{ c.handle }}" target="_blank">@{{ c.handle }}</a>
+            {% if c.display_name %}<div class="text-xs text-zinc-500">{{ c.display_name }}</div>{% endif %}
+          </td>
+          <td class="px-4 py-2 mono text-zinc-400">{{ c.sequence }}</td>
+          <td class="px-4 py-2 mono">{{ c.current_step }}</td>
+          <td class="px-4 py-2 mono text-xs text-zinc-400">{{ c.next_send_at[:16] }}</td>
+          <td class="px-4 py-2">
+            {% set status = c.status %}
+            <span class="badge
+              {% if status == 'pending' %}bg-zinc-800 text-zinc-300
+              {% elif status == 'in_progress' %}bg-blue-950 text-blue-300 border border-blue-900
+              {% elif status == 'completed' %}bg-emerald-950 text-emerald-300 border border-emerald-900
+              {% elif status == 'error' %}bg-red-950 text-red-300 border border-red-900
+              {% elif status == 'stopped' %}bg-amber-950 text-amber-300 border border-amber-900
+              {% else %}bg-zinc-800 text-zinc-300{% endif %}">
+              {{ status }}
+            </span>
+          </td>
+          <td class="px-4 py-2 text-xs text-zinc-500">{{ c.notes }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="px-4 py-2 text-xs text-zinc-500 border-t border-zinc-800">
+    {{ total }} contact{{ '' if total == 1 else 's' }}
+  </div>
+{% endif %}

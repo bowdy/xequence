@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Xequence{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", "Fira Code", Menlo, monospace; }
+    .badge { display:inline-flex; align-items:center; gap:.25rem; padding:.125rem .5rem; border-radius:9999px; font-size:.75rem; }
+    .scroll-y { max-height: 24rem; overflow-y: auto; }
+    .pulse-dot { width:.5rem; height:.5rem; border-radius:9999px; background:#10b981; box-shadow:0 0 0 0 rgba(16,185,129,.6); animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,.6);} 70%{box-shadow:0 0 0 12px rgba(16,185,129,0);} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0);} }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+  <header class="border-b border-zinc-800">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-lg font-semibold tracking-tight">Xequence</span>
+        <span class="text-xs text-zinc-500">DM sequencer for X</span>
+      </div>
+      <div id="session-area"
+           hx-get="/partials/session"
+           hx-trigger="load, every 30s"
+           hx-swap="innerHTML">
+        <span class="text-xs text-zinc-500">loading session…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-zinc-800 mt-16">
+    <div class="max-w-6xl mx-auto px-6 py-4 text-xs text-zinc-500 flex justify-between">
+      <span>localhost only · everything runs on your Mac</span>
+      <span><a class="hover:text-zinc-300" href="https://github.com/bowdy/xequence" target="_blank">source</a></span>
+    </div>
+  </footer>
+</body>
+</html>

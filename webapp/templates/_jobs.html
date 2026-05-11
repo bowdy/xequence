@@ -1,0 +1,7 @@
+{% if not jobs %}
+  <div class="text-sm text-zinc-500">No jobs yet.</div>
+{% else %}
+  {% for job in jobs %}
+    {% include "_job_row.html" %}
+  {% endfor %}
+{% endif %}
