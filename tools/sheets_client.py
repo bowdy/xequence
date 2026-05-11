@@ -14,14 +14,22 @@ Schema (one row per (handle, sequence) pair):
     notes           | freeform; used to surface send errors
 
 The first time you call ensure_sheet(), the header row is created if missing.
+
+Caching: the gspread Client and Worksheet objects are cached at module level
+after their first use. Without this, a single tick over 10 contacts can fire
+~30 read requests at the Sheets API — well past the default 60/min quota.
+With caching, each update is one write request and that's it.
 """
 from __future__ import annotations
 
+import random
 import re
+import threading
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
+from typing import Callable, Iterable, TypeVar
 
 import gspread
 from google.oauth2.service_account import Credentials
@@ -47,7 +55,20 @@ def _extract_sheet_id(value: str) -> str:
     return m.group(1) if m else value
 
 
+# Process-level singletons. The gspread Client is cheap to reuse; the
+# Worksheet object encapsulates the spreadsheet + tab and survives across
+# operations. Resetting them only matters if creds or the sheet ID change at
+# runtime, which we don't support.
+_lock = threading.Lock()
+_client_cache: gspread.Client | None = None
+_worksheet_cache: gspread.Worksheet | None = None
+_header_verified = False
+
+
 def _client() -> gspread.Client:
+    global _client_cache
+    if _client_cache is not None:
+        return _client_cache
     sa_path = Path(env("GOOGLE_SERVICE_ACCOUNT_JSON", required=True))
     if not sa_path.is_absolute():
         sa_path = (Path(__file__).resolve().parent.parent / sa_path).resolve()
@@ -58,22 +79,53 @@ def _client() -> gspread.Client:
             "https://www.googleapis.com/auth/drive.file",
         ],
     )
-    return gspread.authorize(creds)
+    _client_cache = gspread.authorize(creds)
+    return _client_cache
 
 
 def _worksheet() -> gspread.Worksheet:
-    sh_id = _extract_sheet_id(env("XEQUENCE_SHEET_ID", required=True))
-    tab = env("XEQUENCE_SHEET_TAB", "contacts")
-    sh = _client().open_by_key(sh_id)
-    try:
-        ws = sh.worksheet(tab)
-    except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title=tab, rows=1000, cols=len(HEADERS))
-    # Idempotent header ensure
-    first_row = ws.row_values(1)
-    if first_row != HEADERS:
-        ws.update("A1", [HEADERS])
-    return ws
+    global _worksheet_cache, _header_verified
+    with _lock:
+        if _worksheet_cache is not None and _header_verified:
+            return _worksheet_cache
+        sh_id = _extract_sheet_id(env("XEQUENCE_SHEET_ID", required=True))
+        tab = env("XEQUENCE_SHEET_TAB", "contacts")
+        sh = _client().open_by_key(sh_id)
+        try:
+            ws = sh.worksheet(tab)
+        except gspread.WorksheetNotFound:
+            ws = sh.add_worksheet(title=tab, rows=1000, cols=len(HEADERS))
+        # Header verify happens exactly once per process — every subsequent
+        # call goes straight through. This is the call that used to burn
+        # one read per contact during a tick.
+        first_row = ws.row_values(1)
+        if first_row != HEADERS:
+            ws.update("A1", [HEADERS])
+        _worksheet_cache = ws
+        _header_verified = True
+        return ws
+
+
+T = TypeVar("T")
+
+
+def _retry_on_quota(func: Callable[..., T]) -> Callable[..., T]:
+    """Retry an API call on 429 / quota errors with exponential backoff +
+    jitter. Up to 4 attempts (5s, 11s, 22s, 45s). After that, re-raise so
+    the caller can surface the failure in the UI."""
+    def wrapper(*args, **kwargs):
+        for attempt in range(4):
+            try:
+                return func(*args, **kwargs)
+            except gspread.exceptions.APIError as e:
+                msg = str(e)
+                is_quota = "429" in msg or "Quota exceeded" in msg or "RATE_LIMIT" in msg
+                if not is_quota or attempt == 3:
+                    raise
+                delay = (2 ** attempt) * 5 + random.uniform(0, 2)
+                time.sleep(delay)
+        raise RuntimeError("unreachable")
+    return wrapper
 
 
 @dataclass
@@ -126,6 +178,7 @@ def now_iso() -> str:
     return datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat()
 
 
+@_retry_on_quota
 def read_all() -> list[Contact]:
     ws = _worksheet()
     values = ws.get_all_values()
@@ -134,6 +187,7 @@ def read_all() -> list[Contact]:
     return [Contact.from_row(row, i + 1) for i, row in enumerate(values[1:], start=1)]
 
 
+@_retry_on_quota
 def upsert_contact(c: Contact) -> Contact:
     """Insert a new contact row if (handle, sequence) is new; otherwise return existing."""
     ws = _worksheet()
@@ -147,6 +201,7 @@ def upsert_contact(c: Contact) -> Contact:
     return c
 
 
+@_retry_on_quota
 def update_contact(c: Contact) -> None:
     if c._row <= 1:
         raise ValueError("Cannot update a contact without a row index. Read it first.")
