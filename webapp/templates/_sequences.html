@@ -1,11 +1,19 @@
 <div class="p-4 space-y-3">
+  <p class="text-sm text-zinc-400">
+    Each sequence is a list of timed steps. Step 0 fires immediately on enroll.
+    Inside a <span class="mono text-zinc-300">message</span>, you can use
+    <span class="mono text-emerald-400">{first_name}</span>,
+    <span class="mono text-emerald-400">{display_name}</span>, and
+    <span class="mono text-emerald-400">{handle}</span> as placeholders.
+  </p>
+
   {% for s in sequences %}
-    <details class="bg-zinc-950 border border-zinc-800 rounded-lg">
+    <details class="bg-zinc-950 border border-zinc-800 rounded-lg" {% if loop.length == 1 or loop.first %}open{% endif %}>
       <summary class="cursor-pointer px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="mono text-zinc-200">{{ s.name }}</span>
           {% if s.error %}
-            <span class="badge bg-red-950 text-red-300 border border-red-900">error</span>
+            <span class="badge bg-red-950 text-red-300 border border-red-900">error: {{ s.error }}</span>
           {% else %}
             <span class="text-xs text-zinc-500">{{ s.step_count }} steps · day_offsets {{ s.day_offsets }}</span>
           {% endif %}
@@ -15,12 +23,10 @@
       <div class="px-4 pb-4">
         <form hx-post="/actions/save-sequence" hx-target="#sequences-area" hx-swap="innerHTML" class="space-y-2">
           <input type="hidden" name="name" value="{{ s.name }}">
-          <textarea name="body" rows="12"
-            class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-xs focus:border-emerald-600 focus:outline-none"
-            hx-get="/sequences/{{ s.name }}/raw"
-            hx-trigger="load once"
-            hx-swap="innerHTML"></textarea>
-          <div class="flex justify-end">
+          <textarea name="body" rows="14" spellcheck="false"
+            class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-xs focus:border-emerald-600 focus:outline-none">{{ s.raw }}</textarea>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-zinc-500">Edits validate as YAML before saving. Bad YAML keeps the old version.</span>
             <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg" type="submit">
               Save
             </button>
@@ -29,6 +35,7 @@
       </div>
     </details>
   {% endfor %}
+
   {% if saved %}
     <div class="text-xs text-emerald-400">Saved <span class="mono">{{ saved }}</span>.</div>
   {% endif %}
@@ -39,14 +46,14 @@
     </summary>
     <div class="px-4 pb-4">
       <form hx-post="/actions/save-sequence" hx-target="#sequences-area" hx-swap="innerHTML" class="space-y-2">
-        <input type="text" name="name" placeholder="my-sequence"
+        <input type="text" name="name" placeholder="e.g. cold-pings"
                class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-sm focus:border-emerald-600 focus:outline-none">
-        <textarea name="body" rows="10" placeholder="name: my-sequence
+        <textarea name="body" rows="12" spellcheck="false" placeholder="name: cold-pings
 steps:
   - day_offset: 0
-    message: 'hey {first_name}…'
+    message: 'hey {first_name} — saw we connected…'
   - day_offset: 3
-    message: 'ping…'"
+    message: 'one more nudge…'"
           class="mono w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-xs focus:border-emerald-600 focus:outline-none"></textarea>
         <div class="flex justify-end">
           <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg" type="submit">

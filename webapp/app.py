@@ -77,6 +77,7 @@ def session_ok() -> tuple[bool, str]:
 def list_sequences() -> list[dict]:
     out = []
     for p in sorted(SEQUENCES_DIR.glob("*.yaml")):
+        raw = p.read_text()
         try:
             seq = load_sequence(p.stem)
             out.append({
@@ -84,9 +85,18 @@ def list_sequences() -> list[dict]:
                 "file": p.name,
                 "step_count": len(seq.steps),
                 "day_offsets": [s.day_offset for s in seq.steps],
+                "raw": raw,
+                "error": None,
             })
         except Exception as e:
-            out.append({"name": p.stem, "file": p.name, "step_count": 0, "error": str(e)})
+            out.append({
+                "name": p.stem,
+                "file": p.name,
+                "step_count": 0,
+                "day_offsets": [],
+                "raw": raw,
+                "error": str(e),
+            })
     return out
 
 

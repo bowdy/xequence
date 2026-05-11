@@ -2,10 +2,23 @@
 
 {% block content %}
 
-<!-- ROW 1: pull mutuals -->
+<!-- ROW 1: sequences (the thing you build) -->
+<section>
+  <div class="flex items-baseline justify-between mb-3">
+    <h2 class="text-base font-semibold">1. Your message sequences</h2>
+    <span class="text-xs text-zinc-500">stored in <span class="mono">sequences/*.yaml</span></span>
+  </div>
+  <div id="sequences-area"
+       hx-get="/partials/sequences" hx-trigger="load" hx-swap="innerHTML"
+       class="bg-zinc-900 border border-zinc-800 rounded-2xl">
+    <div class="p-6 text-sm text-zinc-500">loading…</div>
+  </div>
+</section>
+
+<!-- ROW 2: pull mutuals + enroll -->
 <section class="grid md:grid-cols-2 gap-6">
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-    <h2 class="text-base font-semibold mb-1">1. Pull mutual follows</h2>
+    <h2 class="text-base font-semibold mb-1">2. Pull mutual follows</h2>
     <p class="text-sm text-zinc-400 mb-4">
       Scrolls /following and /followers and intersects them. Slow — usually 2–10 minutes depending on follower count.
     </p>
@@ -18,9 +31,8 @@
          hx-get="/partials/mutuals" hx-trigger="load, every 10s" hx-swap="innerHTML">loading…</div>
   </div>
 
-  <!-- ROW 1B: enroll -->
   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-    <h2 class="text-base font-semibold mb-1">2. Enroll handles</h2>
+    <h2 class="text-base font-semibold mb-1">3. Enroll handles</h2>
     <p class="text-sm text-zinc-400 mb-4">
       Paste handles (newline or comma separated, with or without @). Already-enrolled handles are skipped.
     </p>
@@ -45,11 +57,11 @@ bob
   </div>
 </section>
 
-<!-- ROW 2: tick -->
+<!-- ROW 3: tick -->
 <section class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
   <div class="flex items-start justify-between gap-6 flex-wrap">
     <div>
-      <h2 class="text-base font-semibold mb-1">3. Run a tick</h2>
+      <h2 class="text-base font-semibold mb-1">4. Run a tick</h2>
       <p class="text-sm text-zinc-400">
         Sends every DM that's come due, paced by your <span class="mono text-zinc-300">.env</span> jitter settings.
         Dry-run shows what would be sent without touching X.
@@ -75,7 +87,7 @@ bob
   <div id="tick-output" class="mt-4"></div>
 </section>
 
-<!-- ROW 3: contacts table -->
+<!-- ROW 4: contacts table -->
 <section>
   <div class="flex items-baseline justify-between mb-3">
     <h2 class="text-base font-semibold">Contacts</h2>
@@ -91,7 +103,7 @@ bob
   </div>
 </section>
 
-<!-- ROW 4: jobs panel -->
+<!-- ROW 5: jobs panel -->
 <section>
   <div class="flex items-baseline justify-between mb-3">
     <h2 class="text-base font-semibold">Recent jobs</h2>
@@ -101,19 +113,6 @@ bob
        hx-get="/partials/jobs" hx-trigger="load, every 3s" hx-swap="innerHTML"
        class="space-y-3">
     <div class="text-sm text-zinc-500">loading…</div>
-  </div>
-</section>
-
-<!-- ROW 5: sequences editor -->
-<section>
-  <div class="flex items-baseline justify-between mb-3">
-    <h2 class="text-base font-semibold">Sequences</h2>
-    <span class="text-xs text-zinc-500">stored in <span class="mono">sequences/*.yaml</span></span>
-  </div>
-  <div id="sequences-area"
-       hx-get="/partials/sequences" hx-trigger="load" hx-swap="innerHTML"
-       class="bg-zinc-900 border border-zinc-800 rounded-2xl">
-    <div class="p-6 text-sm text-zinc-500">loading…</div>
   </div>
 </section>
 
