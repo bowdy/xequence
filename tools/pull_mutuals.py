@@ -11,13 +11,18 @@ The output file is plain text, one handle per line, no @. Feed it into
 """
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-import click
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
-from tools._common import REPO_ROOT, env
-from tools.browser_session import x_session
-from tools.twitter_client import fetch_mutuals
+import click  # noqa: E402
+
+from tools._common import REPO_ROOT, env  # noqa: E402
+from tools.browser_session import x_session  # noqa: E402
+from tools.twitter_client import fetch_mutuals  # noqa: E402
 
 
 @click.command()

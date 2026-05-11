@@ -12,13 +12,18 @@ Usage:
 """
 from __future__ import annotations
 
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
-import click
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
-from tools.sequences import load_sequence, schedule_for_step
-from tools.sheets_client import Contact, now_iso, read_all, upsert_contact
-from datetime import datetime, timezone
+import click  # noqa: E402
+
+from tools.sequences import load_sequence, schedule_for_step  # noqa: E402
+from tools.sheets_client import Contact, now_iso, read_all, upsert_contact  # noqa: E402
 
 
 def _parse_input(file: str | None, handles: str | None) -> list[str]:

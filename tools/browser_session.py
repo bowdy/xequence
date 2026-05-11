@@ -13,14 +13,64 @@ from __future__ import annotations
 
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Iterator
 
-from playwright.sync_api import BrowserContext, Page, sync_playwright
+# When run as `python tools/browser_session.py …`, Python puts `tools/` on
+# sys.path but not the project root, so `from tools._common …` fails. This
+# block makes the file runnable both as a script and as a module.
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
-from tools._common import storage_state_path
+from playwright.sync_api import BrowserContext, Page, sync_playwright  # noqa: E402
+
+from tools._common import storage_state_path  # noqa: E402
 
 
 X_HOME = "https://x.com/home"
+
+
+def _launch_browser(p, *, headless: bool):
+    """Launch the real installed Chrome, not Playwright's bundled Chromium.
+
+    X's login JS checks `navigator.webdriver` and bounces automated browsers
+    in a silent loop. The flags below remove the obvious automation tells
+    that Chromium sets by default. We also use channel="chrome" so we run
+    against the actual Chrome that's installed on this machine, with its
+    full normal fingerprint, rather than the slightly off Chromium binary
+    Playwright ships.
+    """
+    return p.chromium.launch(
+        channel="chrome",
+        headless=headless,
+        args=[
+            "--disable-blink-features=AutomationControlled",
+            "--no-default-browser-check",
+            "--no-first-run",
+        ],
+        ignore_default_args=["--enable-automation"],
+    )
+
+
+def _new_context(browser, *, storage_state: str | None = None):
+    context = browser.new_context(
+        storage_state=storage_state,
+        user_agent=(
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/148.0.0.0 Safari/537.36"
+        ),
+        viewport={"width": 1280, "height": 900},
+        locale="en-US",
+    )
+    # One more layer: even after stripping --enable-automation, JS-level
+    # detection of navigator.webdriver still fires. Override it on every
+    # page load.
+    context.add_init_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+    )
+    return context
 
 
 @contextmanager
@@ -38,16 +88,8 @@ def x_session(*, headless: bool = True) -> Iterator[tuple[BrowserContext, Page]]
         )
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
-        context = browser.new_context(
-            storage_state=str(state_path),
-            user_agent=(
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/131.0.0.0 Safari/537.36"
-            ),
-            viewport={"width": 1280, "height": 900},
-        )
+        browser = _launch_browser(p, headless=headless)
+        context = _new_context(browser, storage_state=str(state_path))
         page = context.new_page()
         try:
             yield context, page
@@ -58,22 +100,49 @@ def x_session(*, headless: bool = True) -> Iterator[tuple[BrowserContext, Page]]
             browser.close()
 
 
-def interactive_login() -> None:
-    """Open a headful browser, let the user log in manually, save the session."""
+def interactive_login(*, wait_seconds: int = 600) -> None:
+    """Open a headful browser, wait for the user to reach the home timeline,
+    save the session automatically, close the window.
+
+    Polls the page URL every 2 seconds for up to `wait_seconds`. The flow ends
+    when the URL contains `/home` (the post-login destination on x.com).
+    No terminal input is required — this works in any environment that can
+    launch a window, including when something else (Claude, a parent script,
+    a button in the web UI) kicks it off.
+    """
+    import time
+
     state_path = storage_state_path()
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context(
-            viewport={"width": 1280, "height": 900},
-        )
+        browser = _launch_browser(p, headless=False)
+        context = _new_context(browser)
         page = context.new_page()
         page.goto("https://x.com/login")
-        print("\n>>> Log in to X in the browser window that just opened.")
-        print(">>> Complete 2FA if prompted.")
-        print(">>> When you can see your home timeline, come back here and press Enter.\n")
-        input("Press Enter when you're logged in… ")
-        context.storage_state(path=str(state_path))
-        print(f"Saved session to {state_path}")
+        print(">>> Log in to X in the browser window that just opened.")
+        print(">>> Complete 2FA if prompted. The window closes itself once you reach the home timeline.")
+        deadline = time.time() + wait_seconds
+        # Detection rule: any x.com URL that is NOT a login/flow page. This
+        # covers /home, /i/timeline, onboarding interstitials, and the
+        # "phone number / interests" prompts X sometimes shows post-login.
+        # We also require an `auth_token` cookie as a hard confirmation —
+        # the only authenticated state X actually persists.
+        while time.time() < deadline:
+            try:
+                url = page.url
+                cookies = {c["name"] for c in context.cookies()}
+            except Exception:
+                url = ""
+                cookies = set()
+            on_x = "x.com" in url or "twitter.com" in url
+            in_login_flow = "/login" in url or "/i/flow/login" in url or "/i/flow/signup" in url
+            logged_in = "auth_token" in cookies
+            if on_x and not in_login_flow and logged_in:
+                context.storage_state(path=str(state_path))
+                print(f"Login detected at {url}. Saved session to {state_path}")
+                browser.close()
+                return
+            time.sleep(2)
+        print(f"Timed out after {wait_seconds}s without seeing /home. No session saved.")
         browser.close()
 
 

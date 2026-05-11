@@ -13,21 +13,27 @@ Run on cron / launchd / any scheduler:
 from __future__ import annotations
 
 import random
+import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
-import click
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
-from tools._common import env
-from tools.browser_session import x_session
-from tools.sequences import (
+import click  # noqa: E402
+
+from tools._common import env  # noqa: E402
+from tools.browser_session import x_session  # noqa: E402
+from tools.sequences import (  # noqa: E402
     load_sequence,
     parse_iso,
     render,
     schedule_for_step,
 )
-from tools.sheets_client import Contact, now_iso, read_all, update_contact
-from tools.twitter_client import fetch_display_name, send_dm
+from tools.sheets_client import Contact, now_iso, read_all, update_contact  # noqa: E402
+from tools.twitter_client import fetch_display_name, send_dm  # noqa: E402
 
 
 def _due(contact: Contact, now: datetime) -> bool:
