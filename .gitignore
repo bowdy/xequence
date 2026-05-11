@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+*.log
+.env
+.env.local
+data/
+playwright-profile/
+.DS_Store
+tsconfig.tsbuildinfo
