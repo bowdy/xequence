@@ -1,0 +1,20 @@
+name: default
+description: Friendly multi-touch sequence over a week.
+
+# Variables you can use inside `message`:
+#   {first_name}    first token of the display name, or the handle if unknown
+#   {display_name}  full X display name
+#   {handle}        X handle without the @
+#
+# day_offset is days from enrollment. Step 0 fires immediately on enroll.
+
+steps:
+  - day_offset: 0
+    message: |
+      hey {first_name} — noticed we're connected on here. what are you working on these days?
+  - day_offset: 3
+    message: |
+      quick ping in case the last note got buried. happy to chat whenever suits.
+  - day_offset: 7
+    message: |
+      one last hello — drop me a line if anything I'm posting overlaps with what you're building.

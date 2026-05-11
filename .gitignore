@@ -1,0 +1,15 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.tmp/
+.playwright_session/
+storage_state.json
+credentials.json
+token.json
+service_account.json
+*.log
+.DS_Store
+.idea/
+.vscode/
