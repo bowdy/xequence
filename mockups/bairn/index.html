@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bairn™ — Kidnap &amp; Ransom Services for Parents Who Are Over It</title>
+<meta name="description" content="Parody site. Bairn™ — premium kidnap & ransom services for exhausted parents. We take the kids. You take a nap. (Satire — obviously.)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f6f3ed;
+    --paper-2: #efeae0;
+    --ink: #1c1a16;
+    --ink-soft: #5b554a;
+    --stone: #8a8273;
+    --sage: #5f6f52;
+    --sage-deep: #3e4a36;
+    --clay: #c2552c;
+    --gold: #b08d3f;
+    --card: #fffdf8;
+    --line: #ddd5c6;
+    --dark: #211f1a;
+    --dark-2: #2b2820;
+    --radius: 18px;
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--sage); color: #fff; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    font-weight: 600; color: var(--sage);
+  }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; }
+  .btn {
+    display: inline-block; padding: 14px 28px; border-radius: 999px;
+    font-weight: 600; font-size: 15px; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,26,22,.15); }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn-light { background: var(--paper); color: var(--ink); }
+
+  /* ---------- parody banner ---------- */
+  .parody-banner {
+    background: var(--clay); color: #fff; text-align: center;
+    font-size: 13px; font-weight: 600; padding: 8px 16px; letter-spacing: .04em;
+  }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(246,243,237,.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .logo { font-family: var(--serif); font-size: 26px; font-weight: 600; text-decoration: none; color: var(--ink); }
+  .logo sup { font-size: 11px; color: var(--stone); }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--ink-soft); font-size: 14px; font-weight: 500; }
+  .nav-links a:hover { color: var(--ink); }
+  @media (max-width: 820px) { .nav-links a:not(.btn) { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 96px 0 72px; position: relative; overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
+  @media (max-width: 880px) { .hero-grid { grid-template-columns: 1fr; } }
+  .hero h1 { font-size: clamp(42px, 6vw, 72px); margin: 18px 0 22px; }
+  .hero h1 em { font-style: italic; color: var(--sage-deep); }
+  .hero p.lede { font-size: 19px; color: var(--ink-soft); max-width: 52ch; margin-bottom: 32px; }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-note { margin-top: 18px; font-size: 13px; color: var(--stone); }
+
+  /* before / after scene cards */
+  .scenes { display: grid; gap: 18px; }
+  .scene {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 24px; box-shadow: 0 10px 30px rgba(28,26,22,.06);
+  }
+  .scene.after { background: var(--sage-deep); border-color: var(--sage-deep); color: #f1efe6; transform: rotate(1.2deg); }
+  .scene.before { transform: rotate(-1.2deg); }
+  .scene .label { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; opacity: .65; }
+  .scene .emoji-row { font-size: 38px; letter-spacing: 6px; margin: 10px 0 8px; line-height: 1.3; }
+  .scene .caption { font-size: 14px; }
+  .scene.before .caption { color: var(--ink-soft); }
+  .shake { display: inline-block; animation: shake 1.6s infinite; }
+  @keyframes shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+  .floaty { display: inline-block; animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .ticker {
+    margin-top: 64px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 14px 0; overflow: hidden; white-space: nowrap;
+  }
+  .ticker-track { display: inline-block; animation: ticker 38s linear infinite; }
+  .ticker span { margin-right: 48px; font-size: 13px; font-weight: 600; color: var(--stone); letter-spacing: .06em; text-transform: uppercase; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ---------- sections ---------- */
+  section { padding: 88px 0; }
+  .section-head { max-width: 640px; margin-bottom: 48px; }
+  .section-head h2 { font-size: clamp(30px, 4vw, 44px); margin: 14px 0 14px; }
+  .section-head p { color: var(--ink-soft); font-size: 17px; }
+
+  /* how it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
+  .step {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 30px 26px;
+  }
+  .step .num { font-family: var(--serif); font-size: 42px; color: var(--gold); line-height: 1; }
+  .step h3 { font-size: 21px; margin: 14px 0 10px; }
+  .step p { font-size: 14.5px; color: var(--ink-soft); }
+  .step .emoji { font-size: 28px; margin-top: 16px; display: block; }
+
+  /* ---------- data dashboard ---------- */
+  .dash { background: var(--dark); color: #ece8dd; }
+  .dash .eyebrow { color: var(--gold); }
+  .dash .section-head p { color: #b3ac9c; }
+  .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 980px) { .dash-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .dash-grid { grid-template-columns: 1fr; } }
+  .stat-card {
+    background: var(--dark-2); border: 1px solid #3a362c; border-radius: var(--radius);
+    padding: 24px 22px;
+  }
+  .stat-card .big { font-family: var(--serif); font-size: 38px; color: #f3efe4; line-height: 1.1; }
+  .stat-card .big small { font-size: 18px; color: var(--gold); }
+  .stat-card .lbl { font-size: 13px; color: #b3ac9c; margin-top: 8px; }
+  .stat-card .src { font-size: 11px; color: #6e6857; margin-top: 12px; display: block; }
+  .dash-row { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 880px) { .dash-row { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--dark-2); border: 1px solid #3a362c; border-radius: var(--radius);
+    padding: 26px 24px;
+  }
+  .panel h3 { font-size: 19px; margin-bottom: 4px; color: #f3efe4; }
+  .panel .sub { font-size: 12.5px; color: #8d8674; margin-bottom: 20px; }
+  .bar-row { display: grid; grid-template-columns: 150px 1fr 48px; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 13px; }
+  .bar-row .name { color: #cfc9b9; }
+  .bar-track { background: #3a362c; border-radius: 99px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--sage), var(--gold)); width: 0; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+  .bar-row .pct { text-align: right; color: #8d8674; font-variant-numeric: tabular-nums; }
+  .panel .footnote { font-size: 11px; color: #6e6857; margin-top: 16px; }
+  .kpi-list { list-style: none; }
+  .kpi-list li {
+    display: flex; justify-content: space-between; gap: 12px; padding: 13px 0;
+    border-bottom: 1px solid #3a362c; font-size: 13.5px;
+  }
+  .kpi-list li:last-child { border-bottom: none; }
+  .kpi-list .k { color: #cfc9b9; }
+  .kpi-list .v { color: var(--gold); font-weight: 600; white-space: nowrap; }
+
+  /* ---------- calculator ---------- */
+  .calc-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(28,26,22,.10);
+    display: grid; grid-template-columns: 1.05fr .95fr; overflow: hidden;
+  }
+  @media (max-width: 880px) { .calc-card { grid-template-columns: 1fr; } }
+  .calc-inputs { padding: 40px 36px; }
+  .calc-inputs h3 { font-size: 24px; margin-bottom: 6px; }
+  .calc-inputs .hint { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 28px; }
+  .field-label { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--stone); display: block; margin-bottom: 10px; }
+  .kid-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .kid-row .kid-emoji { font-size: 26px; width: 34px; text-align: center; }
+  .kid-row input[type=range] { flex: 1; }
+  .kid-age { font-size: 13px; font-weight: 600; min-width: 92px; text-align: right; font-variant-numeric: tabular-nums; }
+  .kid-remove {
+    background: none; border: 1px solid var(--line); border-radius: 8px; width: 28px; height: 28px;
+    cursor: pointer; color: var(--stone); font-size: 14px; line-height: 1;
+  }
+  .kid-remove:hover { border-color: var(--clay); color: var(--clay); }
+  .add-kid {
+    background: none; border: 1.5px dashed var(--stone); color: var(--ink-soft);
+    border-radius: 12px; padding: 10px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer; margin-top: 4px;
+  }
+  .add-kid:hover { border-color: var(--sage); color: var(--sage-deep); }
+  .slider-block { margin-top: 30px; }
+  .slider-value { font-family: var(--serif); font-size: 22px; color: var(--sage-deep); }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; height: 6px; border-radius: 99px;
+    background: var(--line); outline: none; width: 100%;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--sage-deep); border: 3px solid var(--card); box-shadow: 0 2px 8px rgba(0,0,0,.25); cursor: grab;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--sage-deep); border: 3px solid var(--card); box-shadow: 0 2px 8px rgba(0,0,0,.25); cursor: grab;
+  }
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 26px; font-size: 14px; color: var(--ink-soft); }
+  .toggle-row input { width: 18px; height: 18px; accent-color: var(--sage-deep); }
+
+  .calc-results { background: var(--sage-deep); color: #f1efe6; padding: 40px 36px; display: flex; flex-direction: column; }
+  .calc-results .eyebrow { color: #cdd6bf; }
+  .total-saved { font-family: var(--serif); font-size: clamp(44px, 5vw, 60px); line-height: 1; margin: 14px 0 4px; font-variant-numeric: tabular-nums; }
+  .calc-results .through { font-size: 13px; color: #b7c2a6; margin-bottom: 26px; }
+  .result-lines { list-style: none; border-top: 1px solid rgba(241,239,230,.2); }
+  .result-lines li { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; border-bottom: 1px solid rgba(241,239,230,.15); font-size: 13.5px; }
+  .result-lines .v { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .result-lines .fee .v { color: #f0c9b3; }
+  .calc-results .cta { margin-top: auto; padding-top: 28px; }
+  .calc-results .cta .btn { width: 100%; text-align: center; }
+  .calc-results .fine { font-size: 11px; color: #9fae8c; margin-top: 12px; }
+
+  /* ---------- pricing ---------- */
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 880px) { .tiers { grid-template-columns: 1fr; } }
+  .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px 28px; display: flex; flex-direction: column; }
+  .tier.featured { background: var(--ink); color: var(--paper); border-color: var(--ink); position: relative; }
+  .tier .tag {
+    position: absolute; top: -12px; left: 28px; background: var(--gold); color: var(--ink);
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 99px;
+  }
+  .tier h3 { font-size: 22px; }
+  .tier .dur { font-size: 13px; color: var(--stone); margin: 4px 0 18px; }
+  .tier.featured .dur { color: #a9a395; }
+  .tier .price { font-family: var(--serif); font-size: 40px; margin-bottom: 18px; }
+  .tier .price small { font-size: 14px; font-family: var(--sans); color: var(--stone); }
+  .tier ul { list-style: none; font-size: 14px; margin-bottom: 26px; }
+  .tier li { padding: 7px 0 7px 26px; position: relative; color: var(--ink-soft); }
+  .tier.featured li { color: #cfc9bb; }
+  .tier li::before { content: "✓"; position: absolute; left: 0; color: var(--sage); font-weight: 700; }
+  .tier .btn { margin-top: auto; text-align: center; }
+
+  /* ---------- testimonials ---------- */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 880px) { .quotes { grid-template-columns: 1fr; } }
+  .quote { background: var(--paper-2); border-radius: var(--radius); padding: 30px 28px; }
+  .quote p { font-family: var(--serif); font-size: 18px; font-style: italic; margin-bottom: 18px; }
+  .quote .who { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+  .quote .stars { color: var(--gold); letter-spacing: 2px; margin-bottom: 12px; }
+
+  /* ---------- faq ---------- */
+  .faq-list { max-width: 760px; }
+  details {
+    border-bottom: 1px solid var(--line); padding: 4px 0;
+  }
+  summary {
+    cursor: pointer; font-weight: 600; font-size: 16px; padding: 18px 0; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--serif); font-size: 24px; color: var(--stone); }
+  details[open] summary::after { content: "–"; }
+  details p { padding-bottom: 20px; color: var(--ink-soft); font-size: 15px; max-width: 64ch; }
+
+  /* ---------- footer ---------- */
+  footer { background: var(--dark); color: #8d8674; padding: 64px 0 40px; }
+  footer .logo { color: #ece8dd; }
+  .foot-grid { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; margin-bottom: 40px; }
+  .disclaimer {
+    border: 1px solid #3a362c; border-radius: var(--radius); padding: 20px 24px;
+    font-size: 12.5px; line-height: 1.7; color: #b3ac9c; background: var(--dark-2);
+  }
+  .disclaimer strong { color: #ece8dd; }
+  .foot-base { font-size: 12px; margin-top: 28px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+
+<div class="parody-banner">🚨 PARODY — Bairn™ is a fictional spoof business. No children were, are, or ever will be kidnapped. Please nap responsibly. 🚨</div>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="logo" href="#">Bairn<sup>™</sup></a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#data">The Data</a>
+      <a href="#calculator">Savings Calculator</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#calculator" style="padding:10px 22px;">Surrender a child</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Premium Kidnap &amp; Ransom Services · Est. Bedtime</span>
+      <h1>They were a blessing. <em>Were.</em></h1>
+      <p class="lede">
+        Bairn™ is the world's first white-glove kidnap &amp; ransom service for parents
+        who are, frankly, over it. We take the kids. We hold the kids. You set the
+        ransom — and there's absolutely no pressure to pay it.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#calculator">Calculate my savings</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+      </div>
+      <p class="hero-note">No commitment. Unless you want there to be no commitment, forever.</p>
+    </div>
+    <div class="scenes" aria-hidden="true">
+      <div class="scene before">
+        <span class="label" style="color:var(--clay)">Before Bairn — Tuesday, 5:47 AM</span>
+        <div class="emoji-row">😵‍💫 <span class="shake">😭</span> 🥣💥 <span class="shake">🧒</span> 📣 🧱🦶</div>
+        <p class="caption">Cereal on the ceiling. A LEGO in your heel. Someone is screaming about the <em>wrong colour cup</em>. It is not yet 6 AM.</p>
+      </div>
+      <div class="scene after">
+        <span class="label" style="color:#cdd6bf">After Bairn — Tuesday, 11:30 AM</span>
+        <div class="emoji-row"><span class="floaty">😌</span> 🥂 🛋️ 📖 <span class="floaty">🧘</span> 🌅</div>
+        <p class="caption">Silence. A warm coffee, finished while warm. You read a whole page of a book. Then another one. Madness.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track">
+      <span>14,208 naps recovered</span><span>$310,605 — avg. cost of raising one child to 18*</span><span>0 ransoms paid (clients' choice)</span><span>97% of clients "forget" the negotiation call</span><span>62,331 hours of Cocomelon avoided</span><span>every extraction includes snacks</span>
+      <span>14,208 naps recovered</span><span>$310,605 — avg. cost of raising one child to 18*</span><span>0 ransoms paid (clients' choice)</span><span>97% of clients "forget" the negotiation call</span><span>62,331 hours of Cocomelon avoided</span><span>every extraction includes snacks</span>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The Process</span>
+      <h2>Three steps to silence.</h2>
+      <p>Discreet. Professional. Snack-forward. Our operatives are former school-run parents — nobody moves through a pickup line faster.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>The Acquisition</h3>
+        <p>Our team extracts the asset from school pickup, a birthday party, or mid-tantrum in aisle 7. The child will assume it's a fun uncle. Children notice nothing that isn't a screen.</p>
+        <span class="emoji">🚐💨 🍭</span>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>The Holding Period</h3>
+        <p>Assets are held in a 5-star facility with unlimited screen time, chicken nuggets at every meal, and zero bedtimes. Frankly, they will not want to come back. That's by design.</p>
+        <span class="emoji">📱🍗 🎮</span>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>The Negotiation</h3>
+        <p>We send a ransom demand. You set the figure. We recommend $0. Negotiations can take anywhere from one long weekend to 18 years — entirely your call. No judgment. Some judgment.</p>
+        <span class="emoji">📞 🤫 🏖️</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="data" class="dash">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Industry Intelligence</span>
+      <h2>The numbers don't lie. The kids do, constantly.</h2>
+      <p>Real data from the genuine kidnap-&amp;-ransom insurance industry and child-rearing cost research — repurposed for parents who have done the math at 3 AM.</p>
+    </div>
+    <div class="dash-grid">
+      <div class="stat-card">
+        <div class="big">$310,605</div>
+        <div class="lbl">Average cost of raising one child born in 2015 to age 17 in the U.S. — before college.</div>
+        <span class="src">Source: USDA estimate ($233,610, 2015) adjusted for inflation by Brookings, 2022</span>
+      </div>
+      <div class="stat-card">
+        <div class="big">~$1.2<small>B</small></div>
+        <div class="lbl">Global kidnap &amp; ransom insurance market. Yes, this is a real industry. We simply flipped the business model.</div>
+        <span class="src">Source: industry market analyses, 2023</span>
+      </div>
+      <div class="stat-card">
+        <div class="big">75<small>%+</small></div>
+        <div class="lbl">Share of Fortune 500 companies estimated to carry K&amp;R insurance for staff. None of them carry it for toddlers. A gap in the market.</div>
+        <span class="src">Source: commonly cited insurance industry estimate</span>
+      </div>
+      <div class="stat-card">
+        <div class="big">$0</div>
+        <div class="lbl">Bairn's recommended ransom payment. Our most popular negotiating position. Clients describe it as "freeing."</div>
+        <span class="src">Source: Bairn™ Client Satisfaction Survey, n=1 (it was Dave)</span>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <div class="panel">
+        <h3>Where your money actually goes</h3>
+        <p class="sub">Share of child-rearing expenditure by category, married-couple middle-income families (USDA)</p>
+        <div class="bar-row"><span class="name">Housing</span><div class="bar-track"><div class="bar-fill" data-w="29"></div></div><span class="pct">29%</span></div>
+        <div class="bar-row"><span class="name">Food</span><div class="bar-track"><div class="bar-fill" data-w="18"></div></div><span class="pct">18%</span></div>
+        <div class="bar-row"><span class="name">Childcare &amp; education</span><div class="bar-track"><div class="bar-fill" data-w="16"></div></div><span class="pct">16%</span></div>
+        <div class="bar-row"><span class="name">Transportation</span><div class="bar-track"><div class="bar-fill" data-w="15"></div></div><span class="pct">15%</span></div>
+        <div class="bar-row"><span class="name">Healthcare</span><div class="bar-track"><div class="bar-fill" data-w="9"></div></div><span class="pct">9%</span></div>
+        <div class="bar-row"><span class="name">Clothing</span><div class="bar-track"><div class="bar-fill" data-w="6"></div></div><span class="pct">6%</span></div>
+        <div class="bar-row"><span class="name">Misc. (so many sticks)</span><div class="bar-track"><div class="bar-fill" data-w="7"></div></div><span class="pct">7%</span></div>
+        <p class="footnote">USDA "Expenditures on Children by Families" report. "Misc." includes toys that make noise on purpose.</p>
+      </div>
+      <div class="panel">
+        <h3>K&amp;R industry vs. Bairn™</h3>
+        <p class="sub">Comparative service metrics</p>
+        <ul class="kpi-list">
+          <li><span class="k">Typical K&amp;R policy holder</span><span class="v">Oil executives</span></li>
+          <li><span class="k">Bairn™ policy holder</span><span class="v">Tired dads named Greg</span></li>
+          <li><span class="k">Industry: ransom usually paid?</span><span class="v">Negotiated down</span></li>
+          <li><span class="k">Bairn™: ransom usually paid?</span><span class="v">"New phone, who dis"</span></li>
+          <li><span class="k">Industry avg. resolution</span><span class="v">Days–weeks</span></li>
+          <li><span class="k">Bairn™ avg. resolution</span><span class="v">"After uni, maybe"</span></li>
+          <li><span class="k">Proof-of-life requests</span><span class="v">Declined, 97%</span></li>
+        </ul>
+        <p class="footnote">Left column reflects the real K&amp;R insurance industry. Right column reflects a nap-deprived fever dream.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="calculator">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The Liberation Index™</span>
+      <h2>Calculate your savings.</h2>
+      <p>Enter your children's ages. We'll calculate what they'll cost you between now and age 18 — and therefore what Bairn™ puts back in your pocket. Slide responsibly.</p>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-inputs">
+        <h3>Your liabilities <span style="font-size:14px;color:var(--stone);font-weight:400;">(children)</span></h3>
+        <p class="hint">Add each child and set their current age. We handle the rest. We <em>really</em> handle the rest.</p>
+
+        <span class="field-label">Children</span>
+        <div id="kids"></div>
+        <button class="add-kid" id="addKid" type="button">+ Add another child (you absolute glutton)</button>
+
+        <div class="slider-block">
+          <span class="field-label">Annual cost per child — <span class="slider-value" id="costVal">$21,700</span>/yr</span>
+          <input type="range" id="annualCost" min="12000" max="40000" step="100" value="21700" />
+          <p class="hint" style="margin:10px 0 0;font-size:12px;">U.S. average ≈ $21,700/yr (LendingTree, 2023). Slide right if your child has opinions about sneakers.</p>
+        </div>
+
+        <label class="toggle-row">
+          <input type="checkbox" id="college" />
+          <span>They were "definitely going to college" (+$115,000 per child — College Board avg. 4-yr in-state, incl. room &amp; board)</span>
+        </label>
+      </div>
+
+      <div class="calc-results">
+        <span class="eyebrow">Projected savings</span>
+        <div class="total-saved" id="totalSaved">$0</div>
+        <p class="through" id="throughLine">across 0 children, through age 18</p>
+        <ul class="result-lines">
+          <li><span>Child-rearing costs avoided</span><span class="v" id="rawSavings">$0</span></li>
+          <li><span>College fund, repurposed</span><span class="v" id="collegeSavings">$0</span></li>
+          <li class="fee"><span>Bairn™ extraction fee (flat)</span><span class="v" id="feeLine">−$9,999</span></li>
+          <li><span>Ransom paid (recommended)</span><span class="v">$0</span></li>
+          <li><span>Hours of "WHY?" avoided</span><span class="v" id="whyHours">0</span></li>
+          <li><span>Sleep-ins reclaimed</span><span class="v" id="sleepIns">0</span></li>
+        </ul>
+        <div class="cta">
+          <a class="btn btn-light" href="#pricing">Begin the extraction →</a>
+          <p class="fine">Figures are estimates for entertainment purposes. Your children remain legally, morally, and financially yours. Sorry.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" style="background:var(--paper-2);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Engagement Packages</span>
+      <h2>How over it are you?</h2>
+      <p>From a long weekend of silence to a full 18-year negotiation stalemate. All packages include snacks, sunscreen application, and absolutely no updates unless requested.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h3>The Long Weekend</h3>
+        <p class="dur">72 hours of holding</p>
+        <div class="price">$499 <small>/ child</small></div>
+        <ul>
+          <li>Discreet Friday-afternoon acquisition</li>
+          <li>One (1) full uninterrupted lie-in</li>
+          <li>Proof-of-life photos (optional, most decline)</li>
+          <li>Sunday 6 PM return, fed and exhausted</li>
+        </ul>
+        <a class="btn btn-ghost" href="#faq">Test the waters</a>
+      </div>
+      <div class="tier featured">
+        <span class="tag">Most popular</span>
+        <h3>The School Year</h3>
+        <p class="dur">September – June, summers negotiable</p>
+        <div class="price">$4,999 <small>/ child</small></div>
+        <ul>
+          <li>Homework handled by our operatives</li>
+          <li>We attend the recorder concert for you</li>
+          <li>Monthly "they're fine" postcard</li>
+          <li>Ransom demands sent only on your birthday, as a treat</li>
+        </ul>
+        <a class="btn btn-light" href="#faq">Reclaim the year</a>
+      </div>
+      <div class="tier">
+        <h3>Gone for Good*</h3>
+        <p class="dur">The full 18-year stalemate</p>
+        <div class="price">$9,999 <small>flat</small></div>
+        <ul>
+          <li>Full Liberation Index™ savings realised</li>
+          <li>Annual ransom letter (frameable)</li>
+          <li>Asset returned at 18 with a job and manners</li>
+          <li>*"Good" legally means "until they need rent money"</li>
+        </ul>
+        <a class="btn btn-ghost" href="#faq">Go nuclear</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Client Stories</span>
+      <h2>Word of mouth. Quiet, blissful mouth.</h2>
+    </div>
+    <div class="quotes">
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"They sent a ransom note demanding $50,000. I framed it. It hangs where the macaroni art used to be."</p>
+        <span class="who">— Margaret T., mother of three (now, technically, of zero)</span>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"I ate a meal while it was hot. I heard a bird. I didn't step on a single LEGO for nine days. I wept, but in the good way."</p>
+        <span class="who">— Greg P., tired dad (named Greg)</span>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★☆</div>
+        <p>"Four stars only because they eventually gave him back. He returned with manners and a 401(k). Still — unprompted."</p>
+        <span class="who">— Dana &amp; Alex R., negotiated for 11 years</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Questions</span>
+      <h2>Frequently whispered questions.</h2>
+    </div>
+    <div class="faq-list">
+      <details open>
+        <summary>Is this real? Please tell me this isn't real.</summary>
+        <p>It is not real. Bairn™ is a parody website — a joke about parental burnout, the genuinely real (and genuinely strange) kidnap-&amp;-ransom insurance industry, and the eye-watering real cost of raising children. We do not kidnap children. Nobody should kidnap children. If you're a burnt-out parent, the actual product you're looking for is called "a babysitter," "grandparents," or "asking for help," all of which are legal.</p>
+      </details>
+      <details>
+        <summary>Will the children be safe?</summary>
+        <p>Hypothetically, they'd be safer than at home — our fictional facility has corner guards on every table and zero glitter. Realistically, they're safe because they never left your house. They're behind you right now, asking for a snack.</p>
+      </details>
+      <details>
+        <summary>What if I miss them?</summary>
+        <p>Statistically, this occurs around day 3, typically triggered by seeing a small sock. Our fictional retention team will play you a recording of a 45-minute tantrum about a banana that was "broken." The feeling passes.</p>
+      </details>
+      <details>
+        <summary>Do you take teenagers?</summary>
+        <p>We tried. They negotiated better terms than us, unionised the holding facility, and now run our social media. Surcharge applies.</p>
+      </details>
+      <details>
+        <summary>Can I pay the ransom in exposure?</summary>
+        <p>You can't pay it at all. That's the whole product.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="logo" href="#">Bairn<sup>™</sup></a>
+        <p style="max-width:34ch;font-size:13px;margin-top:10px;">Kidnap &amp; Ransom services for parents who are over it. A wholly fictional subsidiary of A Good Night's Sleep, LLC.</p>
+      </div>
+      <div style="font-size:13px;">
+        <p style="color:#ece8dd;font-weight:600;margin-bottom:8px;">Definitely-real offices</p>
+        <p>Witness Protection Plaza, Suite 0<br/>Somewhere Quiet, Population: You<br/>1-800-OVER-IT (do not call)</p>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <strong>⚠️ Parody disclaimer (the serious bit):</strong> This is a satirical mockup. Bairn™ is not a real company, kidnapping is a serious crime, and no service of this kind exists or should exist. The genuine statistics cited (USDA/Brookings child-rearing costs, College Board tuition figures, K&amp;R insurance market estimates) are real and referenced for comedic contrast only. If parenting is genuinely overwhelming you, real support exists — talk to your GP, family, or a parental support line. They will not charge a ransom.
+    </div>
+    <div class="foot-base">
+      <span>© 2026 Bairn™ — No rights reserved, no children acquired.</span>
+      <span>Crafted in deafening silence.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var fmt = function (n) {
+    return "$" + Math.round(n).toLocaleString("en-US");
+  };
+
+  var ANNUAL_DEFAULT = 21700;       // LendingTree 2023 avg annual cost of raising a child
+  var COLLEGE_COST = 115000;        // ~4yr in-state public incl. room & board (College Board)
+  var EXTRACTION_FEE = 9999;
+  var ADULT_AGE = 18;
+  var WHY_PER_DAY = 73;             // "WHY?" utterances per child per day (peer-reviewed by Greg)
+  var KID_EMOJI = ["👶", "🧒", "👧", "🦖", "🧒", "👶", "👧"];
+
+  var kidsEl = document.getElementById("kids");
+  var kids = [4, 7]; // default ages
+
+  function renderKids() {
+    kidsEl.innerHTML = "";
+    kids.forEach(function (age, i) {
+      var row = document.createElement("div");
+      row.className = "kid-row";
+      row.innerHTML =
+        '<span class="kid-emoji">' + KID_EMOJI[i % KID_EMOJI.length] + "</span>" +
+        '<input type="range" min="0" max="17" step="1" value="' + age + '" data-i="' + i + '" aria-label="Age of child ' + (i + 1) + '" />' +
+        '<span class="kid-age">Age ' + age + " · " + (ADULT_AGE - age) + " yrs left</span>" +
+        '<button class="kid-remove" type="button" data-i="' + i + '" title="Remove child (from the calculator)">×</button>';
+      kidsEl.appendChild(row);
+    });
+  }
+
+  function calc() {
+    var annual = +document.getElementById("annualCost").value;
+    var college = document.getElementById("college").checked;
+    var yearsLeft = kids.reduce(function (s, a) { return s + (ADULT_AGE - a); }, 0);
+
+    var raw = yearsLeft * annual;
+    var coll = college ? kids.length * COLLEGE_COST : 0;
+    var fee = kids.length ? EXTRACTION_FEE : 0;
+    var total = Math.max(0, raw + coll - fee);
+
+    document.getElementById("costVal").textContent = fmt(annual);
+    document.getElementById("rawSavings").textContent = fmt(raw);
+    document.getElementById("collegeSavings").textContent = fmt(coll);
+    document.getElementById("feeLine").textContent = "−" + fmt(fee);
+    document.getElementById("whyHours").textContent =
+      Math.round(yearsLeft * 365 * WHY_PER_DAY / 60).toLocaleString("en-US") + " hrs";
+    document.getElementById("sleepIns").textContent =
+      (yearsLeft * 104).toLocaleString("en-US"); // weekends/yr × 2
+    document.getElementById("throughLine").textContent =
+      "across " + kids.length + (kids.length === 1 ? " child" : " children") + ", through age 18";
+
+    animateTotal(total);
+  }
+
+  var displayed = 0, rafId = null;
+  function animateTotal(target) {
+    cancelAnimationFrame(rafId);
+    var start = displayed, t0 = null, DUR = 600;
+    function tick(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / DUR);
+      var eased = 1 - Math.pow(1 - p, 3);
+      displayed = start + (target - start) * eased;
+      document.getElementById("totalSaved").textContent = fmt(displayed);
+      if (p < 1) rafId = requestAnimationFrame(tick);
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  kidsEl.addEventListener("input", function (e) {
+    if (e.target.matches("input[type=range]")) {
+      kids[+e.target.dataset.i] = +e.target.value;
+      var label = e.target.parentNode.querySelector(".kid-age");
+      label.textContent = "Age " + e.target.value + " · " + (ADULT_AGE - e.target.value) + " yrs left";
+      calc();
+    }
+  });
+  kidsEl.addEventListener("click", function (e) {
+    if (e.target.matches(".kid-remove")) {
+      kids.splice(+e.target.dataset.i, 1);
+      renderKids();
+      calc();
+    }
+  });
+  document.getElementById("addKid").addEventListener("click", function () {
+    if (kids.length >= 7) {
+      this.textContent = "Seven is enough. Even for us. (Call for bulk rates.)";
+      return;
+    }
+    kids.push(5);
+    renderKids();
+    calc();
+  });
+  document.getElementById("annualCost").addEventListener("input", calc);
+  document.getElementById("college").addEventListener("change", calc);
+
+  renderKids();
+  calc();
+
+  // animate dashboard bars when scrolled into view
+  var bars = document.querySelectorAll(".bar-fill");
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        en.target.style.width = en.target.dataset.w + "%";
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  bars.forEach(function (b) { io.observe(b); });
+})();
+</script>
+</body>
+</html>
